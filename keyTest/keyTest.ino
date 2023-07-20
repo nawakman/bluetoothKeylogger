@@ -1,4 +1,4 @@
-#include <Keyboard.h>
+#include <Keyboard.h>//either Keyboard.h or KeyboardFR.h
 
 String message; 
 
@@ -20,6 +20,10 @@ for (int i=0x00;i<0x80;i++){
   Keyboard.print(" ");
   delay(10);
 }
+  /*uint8_t code=0xe9;
+  char character="é";
+  Keyboard.press(code);
+  Keyboard.release(code);*/
 }
 
 void loop( )

@@ -6,9 +6,9 @@ class keyCodesFileFactory:
         self.associations=[0 for i in range(256)]#2**8, all possible keycodes
         self.shiftAssociations=[0 for i in range(256)]#2**8, all possible keycodes
         self.altAssociations=[0 for i in range(256)]#2**8, all possible keycodes
-        self.characters=['\0' for i in range(256)]#2**8, all possible keycodes //memory optimisation, last character is "=" at index 95
-        self.shiftCharacters=['\0' for i in range(256)]#2**8, all possible keycodes //memory optimisation, last character is "=" at index 95
-        self.altCharacters=['\0' for i in range(256)]#2**8, all possible keycodes //memory optimisation, last character is "^" at index 57
+        self.characters=['\0' for i in range(140)]#2**8, all possible keycodes //memory optimisation, last character is "<" at index 129
+        self.shiftCharacters=['\0' for i in range(140)]#2**8, all possible keycodes //memory optimisation, last character is "<" at index 139
+        self.altCharacters=['\0' for i in range(96)]#2**8, all possible keycodes //memory optimisation, last character is "}" at index 95
     
     def AddKeycode(self,PS2Code,keyboardCode,character="\0"):
         if self.associations[PS2Code]!=0:
@@ -51,13 +51,13 @@ class keyCodesFileFactory:
         self.file.write(str(hex(lastShiftElem))+"};//for access with PS2 key as index (shift pressed)\nconst uint8_t keyboardAltKeysFR[256]={")
         for code in self.altAssociations:
             self.file.write(str(hex(code))+",")
-        self.file.write(str(hex(lastAltElem))+"};//for access with PS2 key as index (alt pressed)\nconst uint8_t charactersFR[256]={")
+        self.file.write(str(hex(lastAltElem))+"};//for access with PS2 key as index (alt pressed)\nconst uint8_t charactersFR[140]={")
         for char in self.characters:
             self.file.write("'"+char+"',")
-        self.file.write("'"+lastChar+"'};//character associated to each key\nconst uint8_t shiftCharactersFR[256]={")
+        self.file.write("'"+lastChar+"'};//character associated to each key\nconst uint8_t shiftCharactersFR[140]={")
         for shiftChar in self.shiftCharacters:
             self.file.write("'"+shiftChar+"',")
-        self.file.write("'"+lastShiftChar+"'};//character associated to each shift key\nconst uint8_t altCharactersFR[256]={")
+        self.file.write("'"+lastShiftChar+"'};//character associated to each shift key\nconst uint8_t altCharactersFR[96]={")
         for altChar in self.altCharacters:
             self.file.write("'"+altChar+"',")
         self.file.write("'"+lastAltChar+"'};//character associated to each alt key")
@@ -78,48 +78,48 @@ kcff.AddKeycode(0x33,0x22,'''"''')#"
 kcff.AddKeycode(0x34,0x27)#'
 kcff.AddKeycode(0x35,0x28,"(")#(
 kcff.AddKeycode(0x36,0x2d,"-")#-
-kcff.AddKeycode(0x37,0xe8,"è")#è #e8 is 8 ???
+kcff.AddKeycode(0x37,0xe8,"è")#è
 kcff.AddKeycode(0x38,0x5f,"_")#_
 kcff.AddKeycode(0x39,0xe7,"ç")#ç
-kcff.AddKeycode(0x30,0xe5,"à")#à
+kcff.AddKeycode(0x30,0xe0,"à")#à
 kcff.AddKeycode(0x3c,0x29,")")#)
 kcff.AddKeycode(0x5f,0x3d,"=")#=
-kcff.AddShiftKeycode(0x31,0xe1,"1")#1 S
-kcff.AddShiftKeycode(0x32,0xe2,"2")#2 S
-kcff.AddShiftKeycode(0x33,0xe3,"3")#3 S
-kcff.AddShiftKeycode(0x34,0xe4,"4")#4 S
-kcff.AddShiftKeycode(0x35,0xe5,"5")#5 S
-kcff.AddShiftKeycode(0x36,0xee,"6")#6 S
-kcff.AddShiftKeycode(0x37,0xe6,"7")#7 S
-kcff.AddShiftKeycode(0x38,0xe8,"8")#8 S
-kcff.AddShiftKeycode(0x39,0xe9,"9")#9 S
-kcff.AddShiftKeycode(0x30,0xea,"0")#0 S
-kcff.AddShiftKeycode(0x3c,0xb0,"°")#° S
+kcff.AddShiftKeycode(0x31,0x31,"1")#1 S
+kcff.AddShiftKeycode(0x32,0x32,"2")#2 S
+kcff.AddShiftKeycode(0x33,0x33,"3")#3 S
+kcff.AddShiftKeycode(0x34,0x34,"4")#4 S
+kcff.AddShiftKeycode(0x35,0x35,"5")#5 S
+kcff.AddShiftKeycode(0x36,0x36,"6")#6 S
+kcff.AddShiftKeycode(0x37,0x37,"7")#7 S
+kcff.AddShiftKeycode(0x38,0x38,"8")#8 S
+kcff.AddShiftKeycode(0x39,0x39,"9")#9 S
+kcff.AddShiftKeycode(0x30,0x30,"0")#0 S
+kcff.AddShiftKeycode(0x3c,0xba,"°")#° S
 kcff.AddShiftKeycode(0x5f,0x2b,"+")#+ S
 kcff.AddAltKeycode(0X32,0x7e,"~")#~ A
 kcff.AddAltKeycode(0x33,0x23,"#")## A
-kcff.AddAltKeycode(0x34,0x7b)#{ A
-kcff.AddAltKeycode(0x35,0x5b)#[ A
+kcff.AddAltKeycode(0x34,0x7b,"{")#{ A
+kcff.AddAltKeycode(0x35,0x5b,"[")#[ A
 kcff.AddAltKeycode(0x36,0x7c,"|")#| A
 kcff.AddAltKeycode(0x37,0x27)#' A
 kcff.AddAltKeycode(0x38,0x5c,"\\\\")#\ A
 kcff.AddAltKeycode(0x39,0x5e,"^")#^ A
-kcff.AddAltKeycode(0x30,0x1f,"@")#@ A
-kcff.AddAltKeycode(0x3c,0x5d)#] A
-kcff.AddAltKeycode(0x5f,0x7d)#} A
+kcff.AddAltKeycode(0x30,0x40,"@")#@ A
+kcff.AddAltKeycode(0x3c,0x5d,']')#] A
+kcff.AddAltKeycode(0x5f,0x7d,"}")#} A
 
-kcff.AddKeycode(0x20,0xea,"0")#numpad 0
-kcff.AddKeycode(0x21,0xe1,"1")#numpad 1
-kcff.AddKeycode(0x22,0xe2,"2")#numpad 2
-kcff.AddKeycode(0x23,0xe3,"3")#numpad 3
-kcff.AddKeycode(0x24,0xe4,"4")#numpad 4
-kcff.AddKeycode(0x25,0xe5,"5")#numpad 5
-kcff.AddKeycode(0x26,0xe6,"6")#numpad 6
-kcff.AddKeycode(0x27,0xe7,"7")#numpad 7
-kcff.AddKeycode(0x28,0xe8,"8")#numpad 8
-kcff.AddKeycode(0x29,0xe9,"9")#numpad 9
+kcff.AddKeycode(0x20,0x30,"0")#numpad 0
+kcff.AddKeycode(0x21,0x31,"1")#numpad 1
+kcff.AddKeycode(0x22,0x32,"2")#numpad 2
+kcff.AddKeycode(0x23,0x33,"3")#numpad 3
+kcff.AddKeycode(0x24,0x34,"4")#numpad 4
+kcff.AddKeycode(0x25,0x35,"5")#numpad 5
+kcff.AddKeycode(0x26,0x36,"6")#numpad 6
+kcff.AddKeycode(0x27,0x37,"7")#numpad 7
+kcff.AddKeycode(0x28,0x38,"8")#numpad 8
+kcff.AddKeycode(0x29,0x39,"9")#numpad 9
 kcff.AddKeycode(0x2a,0xeb,".")#numpad .
-kcff.AddKeycode(0x2c,0x00,"+")#numpad +
+kcff.AddKeycode(0x2c,0x2b,"+")#numpad +
 kcff.AddKeycode(0x2d,0x2d,"-")#numpad -
 kcff.AddKeycode(0x2e,0x2a,"*")#numpad *
 kcff.AddKeycode(0x2f,0x2f,"/")#numpad /
@@ -128,18 +128,21 @@ kcff.AddKeycode(0x5d,0x5e,"^")#^
 kcff.AddKeycode(0x5e,0x24,"$")#$
 kcff.AddKeycode(0x3a,0xf9,"ù")#ù
 kcff.AddKeycode(0x5c,0x2a,"*")#*
+kcff.AddKeycode(0x8b,0x3c,"<")#<
 kcff.AddKeycode(0x4d,0x2c,",")#,
 kcff.AddKeycode(0x3b,0x3b,";")#;
 kcff.AddKeycode(0x3d,0x3a,":")#:
 kcff.AddKeycode(0x3e,0x21,"!")#!
-#kcff.AddShiftKeycode(0x5d,)#trema
+kcff.AddShiftKeycode(0x5d,0xa8,"¨")#¨ S
 kcff.AddShiftKeycode(0x5e,0xa3,"£")#£ S
 kcff.AddShiftKeycode(0x3a,0x25,"%")#% S
 kcff.AddShiftKeycode(0x5c,0xb5,"µ")#µ S
+kcff.AddShiftKeycode(0x8b,0x3e,">")#> S
 kcff.AddShiftKeycode(0x4d,0x38,"?")#? S
 kcff.AddShiftKeycode(0x3b,0x2e,".")#. S
 kcff.AddShiftKeycode(0x3d,0x2f,"/")#/ S
 kcff.AddShiftKeycode(0x3e,0xa7,"§")#§ S
+kcff.AddAltKeycode(0x5e,0xa4,"¤")#¤
 
 kcff.AddKeycode(0x41,0x71,"q")#q
 kcff.AddKeycode(0x42,0x62,"b")#b

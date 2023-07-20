@@ -2,7 +2,7 @@
 
   PS2KeyAdvanced library example
 
-  Advanced support PS2 KeyboardFR to get every key code byte from a PS2 KeyboardFR
+  Advanced support PS2 Keyboard to get every key code byte from a PS2 Keyboard
   for testing purposes.
 
   IMPORTANT WARNING
@@ -37,7 +37,7 @@
     4       +5V
     5       KBD Clock
 
-   KeyboardFR has 5V and GND connected see plenty of examples and
+   Keyboard has 5V and GND connected see plenty of examples and
    photos around on Arduino site and other sites about the PS2 Connector.
 
  Interrupts
@@ -82,7 +82,7 @@
                     8B NOT included
                     8C-8E ACPI power
                     91-A0 and F2 and F1 - Special multilingual
-        A8-FF   KeyboardFR communications commands (note F2 and F1 are special
+        A8-FF   Keyboard communications commands (note F2 and F1 are special
                 codes for special multi-lingual keyboards)
 
     By using these ranges it is possible to perform detection of any key and do
@@ -113,7 +113,7 @@
      handle appropriately
         0xAA   keyboard has reset and passed power up tests
                will happen if keyboard plugged in after code start
-        0xFC   KeyboardFR General error or power up fail
+        0xFC   Keyboard General error or power up fail
 
   See PS2Keyboard.h file for returned definitions of Keys
 
@@ -128,10 +128,10 @@
 */
 
 #include <PS2KeyAdvanced.h>
-#include <KeyboardFR.h>
+#include <KeyboardFR.h>//https://github.com/matthgyver/Arduino-Keyboard-FR //fix-issue-2 branch
 #include "keycodesFR.h"
 
-/* KeyboardFR constants  Change to suit your Arduino
+/* Keyboard constants  Change to suit your Arduino
    define pins used for data and clock from keyboard */
 #define DATAPIN 4
 #define IRQPIN  3
@@ -145,6 +145,8 @@ uint16_t lastC=0;
 unsigned long keypressTime;
 String message; 
 String messageBT; 
+bool shiftPressed;//shift or capslock active
+bool altPressed;//altgr active
 bool ignoreFirstKeypress=false;//else it keeps pressing "[" or "e" while plugging the board
 
 PS2KeyAdvanced PS2Keyboard;
@@ -153,16 +155,16 @@ void setup( )
 {
 digitalWrite(RESET_PIN,HIGH);//prevent reboot //need to be called before pinMode else locked in reset mode
 pinMode(RESET_PIN,OUTPUT);
-pinMode(USB_KB_ALIM,OUTPUT);//5V alim for PS2 or USB KeyboardFR
+pinMode(USB_KB_ALIM,OUTPUT);//5V alim for PS2 or USB Keyboard
 digitalWrite(USB_KB_ALIM,HIGH);
 
 // Configure the keyboard library
-KeyboardFR.begin();
+Keyboard.begin();
 // Configure the PS2 keyboard library
 PS2Keyboard.begin( DATAPIN, IRQPIN );
 // Configure serial communication
 Serial.begin(9600);
-Serial1.begin(9600);  // HC-05 //https://github.com/Sackhorn/HC05-BluetoothWithArduinoProMicro //https://forum.arduino.cc/t/arduino-uno-hc05-weird-data-transfer/891267/15
+Serial1.begin(9600);  // HC-05 //https://github.com/Sackhorn/HC05-BluetoothWithArduinoProMicro //https://forum.arduino.cc/t/arduino-uno-hc05-weird-data-transfer/891267/15 //bluetooth can stop working if too much dynamic memory is used
 }
 
 void loop( )
@@ -175,6 +177,8 @@ void loop( )
       if((c>0) && (ignoreFirstKeypress || bitRead(c,15))){//ignore first keypress but not the other after
         keypressTime=millis();
         ignoreFirstKeypress=true;
+        shiftPressed=bitRead(c,12) || bitRead(c,14);//shift or capslock pressed
+        altPressed=bitRead(c,10);//altgr pressed
         TransmitKeypress();
         AddCharToMessage();
         PrintModifiers();
@@ -191,8 +195,7 @@ void loop( )
   }
 }
 
-int StrHexToInt(String str)
-{
+int StrHexToInt(String str){
   char temp[4];//0x..
   str.toCharArray(temp,4);
   return (uint8_t)strtol(temp, 0, 16);//char arraay to long to uint8_t
@@ -218,120 +221,120 @@ void SerialToKeyboard(){
       Serial1.println("isCustomKey");
       String messageNo0x=messageBT;
       messageNo0x.remove(0,2);//remove '0x'
-      KeyboardFR.press(StrHexToInt(messageNo0x));
-      KeyboardFR.release(StrHexToInt(messageNo0x));
+      Keyboard.press(StrHexToInt(messageNo0x));
+      Keyboard.release(StrHexToInt(messageNo0x));
     } 
     else if(messageBT=="releaseAll\r\n"){
-      KeyboardFR.releaseAll();
+      Keyboard.releaseAll();
     }
     else if(messageBT=="enter\r\n"){
-      KeyboardFR.press(KEY_RETURN);
+      Keyboard.press(KEY_RETURN);
     }
     else if(messageBT=="backspace\r\n"){
-      KeyboardFR.press(KEY_BACKSPACE);
-      KeyboardFR.release(KEY_BACKSPACE);
+      Keyboard.press(KEY_BACKSPACE);
+      Keyboard.release(KEY_BACKSPACE);
     }
     else if(messageBT=="ctrl\r\n"){
-      KeyboardFR.press(KEY_LEFT_CTRL);
+      Keyboard.press(KEY_LEFT_CTRL);
     }
     else if(messageBT=="alt\r\n"){
-      KeyboardFR.press(KEY_LEFT_ALT);
+      Keyboard.press(KEY_LEFT_ALT);
     }
     else if(messageBT=="tab\r\n"){
-      KeyboardFR.press(KEY_TAB);
+      Keyboard.press(KEY_TAB);
     }
     else if(messageBT=="1tab\r\n"){
-      KeyboardFR.press(KEY_TAB);
-      KeyboardFR.release(KEY_TAB);
+      Keyboard.press(KEY_TAB);
+      Keyboard.release(KEY_TAB);
     }
     else if(messageBT=="windows\r\n"){
-      KeyboardFR.press(KEY_LEFT_GUI);
+      Keyboard.press(KEY_LEFT_GUI);
     }
     else if(messageBT=="1windows\r\n"){
-      KeyboardFR.press(KEY_LEFT_GUI);
-      KeyboardFR.release(KEY_LEFT_GUI);
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.release(KEY_LEFT_GUI);
     }
     else if(messageBT=="shift\r\n"){
-      KeyboardFR.press(KEY_LEFT_SHIFT);
+      Keyboard.press(KEY_LEFT_SHIFT);
     }
     else if(messageBT=="esc\r\n"){
-      KeyboardFR.press(KEY_ESC);
+      Keyboard.press(KEY_ESC);
     }
     else if(messageBT=="del\r\n"){
-      KeyboardFR.press(KEY_DELETE);
-      KeyboardFR.release(KEY_DELETE);
+      Keyboard.press(KEY_DELETE);
+      Keyboard.release(KEY_DELETE);
     }
     else if(messageBT=="up\r\n"){
-      KeyboardFR.press(KEY_UP_ARROW);
-      KeyboardFR.release(KEY_UP_ARROW);
+      Keyboard.press(KEY_UP_ARROW);
+      Keyboard.release(KEY_UP_ARROW);
     }
     else if(messageBT=="down\r\n"){
-      KeyboardFR.press(KEY_DOWN_ARROW);
-      KeyboardFR.release(KEY_DOWN_ARROW);
+      Keyboard.press(KEY_DOWN_ARROW);
+      Keyboard.release(KEY_DOWN_ARROW);
     }
     else if(messageBT=="left\r\n"){
-      KeyboardFR.press(KEY_LEFT_ARROW);
-      KeyboardFR.release(KEY_LEFT_ARROW);
+      Keyboard.press(KEY_LEFT_ARROW);
+      Keyboard.release(KEY_LEFT_ARROW);
       }
     else if(messageBT=="right\r\n"){
-      KeyboardFR.press(KEY_RIGHT_ARROW);
-      KeyboardFR.release(KEY_RIGHT_ARROW);
+      Keyboard.press(KEY_RIGHT_ARROW);
+      Keyboard.release(KEY_RIGHT_ARROW);
     }
     //keyboard shortcuts
     else if(messageBT=="alt f4\r\n"){
-      KeyboardFR.press(KEY_LEFT_ALT);
-      KeyboardFR.press(KEY_F4);
-      KeyboardFR.release(KEY_LEFT_ALT);
-      KeyboardFR.release(KEY_F4);
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press(KEY_F4);
+      Keyboard.release(KEY_LEFT_ALT);
+      Keyboard.release(KEY_F4);
     }
     else if(messageBT=="alt d\r\n"){
-      KeyboardFR.press(KEY_LEFT_ALT);
-      KeyboardFR.press('d');
-      KeyboardFR.release(KEY_LEFT_ALT);
-      KeyboardFR.release('d');
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press('d');
+      Keyboard.release(KEY_LEFT_ALT);
+      Keyboard.release('d');
     }
     else if(messageBT=="alt tab\r\n"){
-      KeyboardFR.press(KEY_LEFT_ALT);
-      KeyboardFR.press(KEY_TAB);
-      KeyboardFR.release(KEY_LEFT_ALT);
-      KeyboardFR.press(KEY_TAB);
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press(KEY_TAB);
+      Keyboard.release(KEY_LEFT_ALT);
+      Keyboard.press(KEY_TAB);
     }
     else if(messageBT=="ctrl c\r\n"){
-      KeyboardFR.press(KEY_LEFT_CTRL);
-      KeyboardFR.press('c');
-      KeyboardFR.release(KEY_LEFT_CTRL);
-      KeyboardFR.release('c');
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('c');
+      Keyboard.release(KEY_LEFT_CTRL);
+      Keyboard.release('c');
     }
     else if(messageBT=="ctrl a\r\n"){
-      KeyboardFR.press(KEY_LEFT_CTRL);
-      KeyboardFR.press('a');
-      KeyboardFR.release(KEY_LEFT_CTRL);
-      KeyboardFR.release('a');
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('a');
+      Keyboard.release(KEY_LEFT_CTRL);
+      Keyboard.release('a');
     }
     else if(messageBT=="ctrl v\r\n"){
-      KeyboardFR.press(KEY_LEFT_CTRL);
-      KeyboardFR.press('v');
-      KeyboardFR.release(KEY_LEFT_CTRL);
-      KeyboardFR.release('v');
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('v');
+      Keyboard.release(KEY_LEFT_CTRL);
+      Keyboard.release('v');
     }
     else if(messageBT=="ctrl w\r\n"){
-      KeyboardFR.press(KEY_LEFT_CTRL);
-      KeyboardFR.press('w');
-      KeyboardFR.release(KEY_LEFT_CTRL);
-      KeyboardFR.release('w');
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('w');
+      Keyboard.release(KEY_LEFT_CTRL);
+      Keyboard.release('w');
     }
     else if(messageBT=="ctrl t\r\n"){
-      KeyboardFR.press(KEY_LEFT_CTRL);
-      KeyboardFR.press('t');
-      KeyboardFR.release(KEY_LEFT_CTRL);
-      KeyboardFR.release('t');
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press('t');
+      Keyboard.release(KEY_LEFT_CTRL);
+      Keyboard.release('t');
     }  
     else{
       String messageNoRN=messageBT;
       int msgLen=messageNoRN.length();
       messageNoRN.remove(msgLen-1);//remove \r
       messageNoRN.remove(msgLen-2);//remove \n
-      KeyboardFR.print(messageNoRN);
+      Keyboard.print(messageNoRN);
     }
   }
 }
@@ -339,11 +342,12 @@ void SerialToKeyboard(){
 void AddCharToMessage(){//called twice each keypress (pressed/released)
   if (bitRead(c,15)){//is key released
     uint8_t code=c & 0xFF;
-    bool shiftPressed=bitRead(c,12) || bitRead(c,14);//shift or capslock pressed
-    bool altPressed=bitRead(c,10);//altgr pressed
     if(!(AddSpecialCharacterFR(shiftPressed,altPressed,code) || IsBlankCharacterFR(shiftPressed,altPressed,code))){//if this is not a  a special character (has not been processed) or blank character //NEED TO BE EXECUTED IN THIS ORDER //do not go further if any of the two functions return true)
       if(shiftPressed){//if shift or capsLock
         message+=(char)shiftCharactersFR[code];//upperCase
+      }
+      else if(altPressed){
+        message+=(char)altCharactersFR[code];//altgr characters
       }
       else{//if not shift or capsLock
         message+=(char)charactersFR[code];//lowerCase
@@ -354,7 +358,7 @@ void AddCharToMessage(){//called twice each keypress (pressed/released)
 
 bool AddSpecialCharacterFR(bool shiftPressed,bool altPressed,uint8_t code){//return true if this is a special character and is added to the message, false else
   /*ADD ANYWAY*/
-  /*if(code==0x1f){
+  if(code==0x1f){
       message+=' ';
       return true;
   }
@@ -371,39 +375,34 @@ bool AddSpecialCharacterFR(bool shiftPressed,bool altPressed,uint8_t code){//ret
     return true;
   }
   if (shiftPressed){//shift pressed
-    if(code==0x5d){
-      message+='{';
+    return false;//no special character with shift keys with french keyboard
+  if (altPressed){
+    return false;//no special character with alt key with french keyboard
+  }
+  }
+  else{//shift not pressed
+    if(code==0x34){//[
+      message+='\'';
       return true;
     }
-    else if(code==0x5e){
-      message+='}';
+    else if(code==0x37){
+      message+='\'';
       return true;
     }
   }
-  else{//shift not pressed
-    if(code==0x5d){//[
-      message+='[';
-      return true;
-    }
-    else if(code==0x5e){
-      message+=']';
-      return true;
-    }
-    else if(code==0x3a){
-      message+='\'';
-    }
-  }*/
   return false;
 }
 
 bool IsBlankCharacterFR(bool shiftPressed,bool altPressed,uint8_t code){//if a blank character is added to String the String comparisons do not work //KEYS LIKE ENTER AND BACKSPACE ARE BLANK CHARACTER BUT STILL NEED TO BE EXAMINATED
-  /*if (shiftPressed){
+  if (shiftPressed){
     return shiftCharactersFR[code]=='\0';
+  }
+  else if (altPressed){
+    return altCharactersFR[code]=='\0';
   }
   else{
     return charactersFR[code]=='\0';
-  }*/
-  return false;
+  }
 }
 
 void PrintAndClearMessage(){
@@ -463,19 +462,22 @@ void TransmitKeypress(){
     Serial.print(code, HEX);
     Serial.print(">>");
     Serial.println(keyboardKeysFR[code],HEX);
-    if(bitRead(c,14) || bitRead(c,12)){//shift or capslock active
-      KeyboardFR.press(keyboardShiftKeysFR[code]);
+    if (shiftPressed){
+      Keyboard.press(keyboardShiftKeysFR[code]);
     }
-    else if(bitRead(c,10)){//altgr active
-      KeyboardFR.press(keyboardAltKeysFR[code]);
+    else if(altPressed){//altgr active
+      Keyboard.press("[");    
+      Keyboard.release("[");
+      Keyboard.press(keyboardAltKeysFR[code]);
+      Serial1.println("altChar");
     }
     else{
-      KeyboardFR.press(keyboardKeysFR[code]);
+      Keyboard.press(keyboardKeysFR[code]);
     }
   }
   else{//key released
-    KeyboardFR.release(keyboardShiftKeysFR[code]);
-    KeyboardFR.release(keyboardAltKeysFR[code]);
-    KeyboardFR.release(keyboardKeysFR[code]);
+    Keyboard.release(keyboardShiftKeysFR[code]);
+    Keyboard.release(keyboardAltKeysFR[code]);
+    Keyboard.release(keyboardKeysFR[code]);
   }
 }

@@ -144,7 +144,8 @@ uint16_t c;
 uint16_t lastC=0;
 unsigned long keypressTime;
 String message; 
-String messageBT; 
+String messageBT;
+bool shiftPressed;//shift or capslock active
 bool ignoreFirstKeypress=false;//else it keeps pressing "[" or "e" while plugging the board
 
 PS2KeyAdvanced PS2Keyboard;
@@ -175,6 +176,7 @@ void loop( )
       if((c>0) && (ignoreFirstKeypress || bitRead(c,15))){//ignore first keypress but not the other after
         keypressTime=millis();
         ignoreFirstKeypress=true;
+        shiftPressed=bitRead(c,12) || bitRead(c,14);//shift or capslock pressed
         TransmitKeypress();
         AddCharToMessage();
         PrintModifiers();
@@ -191,8 +193,7 @@ void loop( )
   }
 }
 
-int StrHexToInt(String str)
-{
+int StrHexToInt(String str){
   char temp[4];//0x..
   str.toCharArray(temp,4);
   return (uint8_t)strtol(temp, 0, 16);//char arraay to long to uint8_t
@@ -339,7 +340,6 @@ void SerialToKeyboard(){
 void AddCharToMessage(){//called twice each keypress (pressed/released)
   if (bitRead(c,15)){//is key released
     uint8_t code=c & 0xFF;
-    bool shiftPressed=bitRead(c,12) || bitRead(c,14);//shift or capslock pressed
     if(!(AddSpecialCharacterUS(shiftPressed,code) || IsBlankCharacterUS(shiftPressed,code))){//if this is not a  a special character (has not been processed) or blank character //NEED TO BE EXECUTED IN THIS ORDER //do not go further if any of the two functions return true)
       if(shiftPressed){//if shift or capsLock
         message+=(char)shiftCharactersUS[code];//upperCase
@@ -370,26 +370,12 @@ bool AddSpecialCharacterUS(bool shiftPressed,uint8_t code){//return true if this
     return true;
   }
   if (shiftPressed){//shift pressed
-    if(code==0x5d){
-      message+='{';
-      return true;
-    }
-    else if(code==0x5e){
-      message+='}';
-      return true;
-    }
+    return false;
   }
   else{//shift not pressed
-    if(code==0x5d){//[
-      message+='[';
-      return true;
-    }
-    else if(code==0x5e){
-      message+=']';
-      return true;
-    }
-    else if(code==0x3a){
+    if(code==0x3a){
       message+='\'';
+      return true;
     }
   }
   return false;
@@ -461,7 +447,7 @@ void TransmitKeypress(){
     Serial.print(code, HEX);
     Serial.print(">>");
     Serial.println(keyboardKeysUS[code],HEX);
-    if(bitRead(c,14) || bitRead(c,12)){//shift or capslock active
+    if(shiftPressed){//shift or capslock active
       Keyboard.press(keyboardShiftKeysUS[code]);
     }
     else{

@@ -1,1 +1,1 @@
-this is a bluetooth keylogger for US and FR keyboard layouts
+this is an ARDUINO bluetooth keylogger for US and FR keyboard layouts (PS2 compatibles keyboards only), using the Arduino pro micro and the HC-05
