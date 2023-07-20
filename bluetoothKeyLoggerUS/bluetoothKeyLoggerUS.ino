@@ -357,26 +357,18 @@ bool AddSpecialCharacterUS(bool shiftPressed,uint8_t code){//return true if this
       message+=' ';
       return true;
   }
-  else if(code==0x1c){
+  else if(code==0x1c){//backspace
     message+='\b';
     return true;
   }
-  else if(code==0x1d){
-    message+='\t';
+  else if(code==0x1d){//tab
+    message+=' ';//display space instead of tab for readability (\t shpws "^|"")
+    Serial1.println("Tab");
     return true;
   }
-  else if(code==0x1e){
+  else if(code==0x1e || code==0x2b){//both enter keys
     message+='\n';
     return true;
-  }
-  if (shiftPressed){//shift pressed
-    return false;
-  }
-  else{//shift not pressed
-    if(code==0x3a){
-      message+='\'';
-      return true;
-    }
   }
   return false;
 }
@@ -444,9 +436,6 @@ void PrintModifiers(){
 void TransmitKeypress(){
   uint8_t code=c & 0xFF;
   if(!bitRead(c,15)){//key pressed
-    Serial.print(code, HEX);
-    Serial.print(">>");
-    Serial.println(keyboardKeysUS[code],HEX);
     if(shiftPressed){//shift or capslock active
       Keyboard.press(keyboardShiftKeysUS[code]);
     }

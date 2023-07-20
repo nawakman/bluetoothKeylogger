@@ -128,7 +128,7 @@
 */
 
 #include <PS2KeyAdvanced.h>
-#include <KeyboardFR.h>//https://github.com/matthgyver/Arduino-Keyboard-FR //fix-issue-2 branch
+#include <KeyboardFR.h>//https://github.com/matthgyver/Arduino-Keyboard-FR/tree/fix-issue-2
 #include "keycodesFR.h"
 
 /* Keyboard constants  Change to suit your Arduino
@@ -362,33 +362,18 @@ bool AddSpecialCharacterFR(bool shiftPressed,bool altPressed,uint8_t code){//ret
       message+=' ';
       return true;
   }
-  else if(code==0x1c){
+  else if(code==0x1c){//backspace
     message+='\b';
     return true;
   }
-  else if(code==0x1d){
-    message+='\t';
+  else if(code==0x1d){//tab
+    message+=' ';//display space instead of tab for readability (\t shpws "^|"")
+    Serial1.println("Tab");
     return true;
   }
-  else if(code==0x1e){
+  else if(code==0x1e || code==0x2b){//both enter keys
     message+='\n';
     return true;
-  }
-  if (shiftPressed){//shift pressed
-    return false;//no special character with shift keys with french keyboard
-  if (altPressed){
-    return false;//no special character with alt key with french keyboard
-  }
-  }
-  else{//shift not pressed
-    if(code==0x34){//[
-      message+='\'';
-      return true;
-    }
-    else if(code==0x37){
-      message+='\'';
-      return true;
-    }
   }
   return false;
 }
@@ -459,9 +444,6 @@ void PrintModifiers(){
 void TransmitKeypress(){
   uint8_t code=c & 0xFF;
   if(!bitRead(c,15)){//key pressed
-    Serial.print(code, HEX);
-    Serial.print(">>");
-    Serial.println(keyboardKeysFR[code],HEX);
     if (shiftPressed){
       Keyboard.press(keyboardShiftKeysFR[code]);
     }

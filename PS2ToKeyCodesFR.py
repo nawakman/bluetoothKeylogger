@@ -75,7 +75,7 @@ kcff.AddKeycode(0x40,0xb2,"²")#²
 kcff.AddKeycode(0x31,0x26,"&")#&
 kcff.AddKeycode(0x32,0xe9,"é")#é
 kcff.AddKeycode(0x33,0x22,'''"''')#"
-kcff.AddKeycode(0x34,0x27)#'
+kcff.AddKeycode(0x34,0x27,"\\'")#'
 kcff.AddKeycode(0x35,0x28,"(")#(
 kcff.AddKeycode(0x36,0x2d,"-")#-
 kcff.AddKeycode(0x37,0xe8,"è")#è
@@ -101,7 +101,7 @@ kcff.AddAltKeycode(0x33,0x23,"#")## A
 kcff.AddAltKeycode(0x34,0x7b,"{")#{ A
 kcff.AddAltKeycode(0x35,0x5b,"[")#[ A
 kcff.AddAltKeycode(0x36,0x7c,"|")#| A
-kcff.AddAltKeycode(0x37,0x27)#' A
+kcff.AddAltKeycode(0x37,0x27,"\\'")#' A
 kcff.AddAltKeycode(0x38,0x5c,"\\\\")#\ A
 kcff.AddAltKeycode(0x39,0x5e,"^")#^ A
 kcff.AddAltKeycode(0x30,0x40,"@")#@ A
@@ -123,6 +123,7 @@ kcff.AddKeycode(0x2c,0x2b,"+")#numpad +
 kcff.AddKeycode(0x2d,0x2d,"-")#numpad -
 kcff.AddKeycode(0x2e,0x2a,"*")#numpad *
 kcff.AddKeycode(0x2f,0x2f,"/")#numpad /
+kcff.AddKeycode(0x2b,0xb0)#numpad enter
 
 kcff.AddKeycode(0x5d,0x5e,"^")#^
 kcff.AddKeycode(0x5e,0x24,"$")#$
@@ -133,7 +134,7 @@ kcff.AddKeycode(0x4d,0x2c,",")#,
 kcff.AddKeycode(0x3b,0x3b,";")#;
 kcff.AddKeycode(0x3d,0x3a,":")#:
 kcff.AddKeycode(0x3e,0x21,"!")#!
-kcff.AddShiftKeycode(0x5d,0xa8,"¨")#¨ S
+#kcff.AddShiftKeycode(0x5d,0x,"¨")#¨ S #not implemented ?
 kcff.AddShiftKeycode(0x5e,0xa3,"£")#£ S
 kcff.AddShiftKeycode(0x3a,0x25,"%")#% S
 kcff.AddShiftKeycode(0x5c,0xb5,"µ")#µ S
