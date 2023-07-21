@@ -12,12 +12,14 @@ You can find the wiring diagram to make your own, I mounted the component the wa
 
 <img src="projectDiagram_bb.png" height="300"><img src="Pictures/sideView.jpg" height="300" style="margin-left:10px">
 
+**/!\\** _upload your sketch to the board before connecting pin 9 to RST, else it might get stuck in reset mode because pin 9 is LOW_
 
-and in the more vertical way possible so it ressembles a dongle
+
+I as well tried to assemble the component in the more vertical way possible so it ressembles a dongle
 
 <img src="Pictures/frontView.jpg" height="600">
 
-I also 3d printed a case just the correct size to secure it in
+I also 3d printed a case just the correct size to secure it in (stl file included in repo)
 
 <img src="Pictures/boxOpen.jpg" height="300"><img src="Pictures/boxClosed.jpg" height="300" style="margin-left:10px">
 
